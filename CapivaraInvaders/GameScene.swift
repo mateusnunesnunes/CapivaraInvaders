@@ -3,87 +3,367 @@
 //  CapivaraInvaders
 //
 //  Created by Mateus Nunes on 03/03/20.
-//  Copyright © 2020 Mateus Nunes. All rights reserved.
+//  Copyrght © 2020 Mateus Nunes. All rights reserved.
 //
-
 import SpriteKit
 import GameplayKit
-
-class GameScene: SKScene {
-    
-    private var label : SKLabelNode?
-    private var spinnyNode : SKShapeNode?
-    
+import UIKit
+class GameScene: SKScene, SKPhysicsContactDelegate {
+    let skins = ["capivarinha1","capivarinha2","capivarinha3"]
+    let player = SKSpriteNode(imageNamed: "busao2")
+    let terra = SKSpriteNode(imageNamed: "terra")
+    let enemy = SKSpriteNode(imageNamed: "capivarinha1")
+    let nodes: [SKShapeNode] = []
+    var onTap  = false
+    var lastUpdate = TimeInterval()
+    var shotInterval = TimeInterval(0.4)
+    var interval: Double = 0
+    var lastShot = TimeInterval()
+    var viewController : GameViewController!
+    var lastUpdateCap = TimeInterval()
+    var shotIntervalCap = TimeInterval(0.6)
+    var intervalCap: Double = 0
+    var lastShotCap = TimeInterval()
+    var numInimigosLocal = 0
+    var trocouFase = false
+    var contFase = 0
+    let moveEnemy = SKAction.moveBy(x: 0, y: 15, duration: 0.7)
+    let moveEnemy2 = SKAction.moveBy(x: 0, y: -15, duration: 0.7)
+    var terraExplodiu = false
+    var tirosNaTerra = 0
+    var initialCarregou =  false
+    var jogando = false
+    let fases: [Fase] = [
+        Fase(numeroInimigos: 12, texto: "Fase 1", arrayInimigos: []),
+        Fase(numeroInimigos: 18, texto: "Fase 2", arrayInimigos: []),
+        Fase(numeroInimigos: 24, texto: "Fase 3", arrayInimigos: []),
+        Fase(numeroInimigos: 30, texto: "Fase 4", arrayInimigos: [])
+    ]
     override func didMove(to view: SKView) {
-        
-        // Get label node from scene and store it for use later
-        self.label = self.childNode(withName: "//helloLabel") as? SKLabelNode
-        if let label = self.label {
-            label.alpha = 0.0
-            label.run(SKAction.fadeIn(withDuration: 2.0))
+        print("PRIMERASSA")
+        physicsWorld.contactDelegate = self
+        physicsWorld.gravity = .zero
+        if let particles = SKEmitterNode(fileNamed: "Starfield"){
+            particles.position = CGPoint(x: 0, y: 1080)
+            particles.advanceSimulationTime(60)
+            particles.zPosition = -2
+            addChild(particles)
         }
+        inicio()
+    }
+    func disparaPlayer(view:SKView){
+        let shot = SKSpriteNode(imageNamed: "missil")
+        shot.name = "shot"
+        let move = SKAction.moveTo(y: 500, duration: 0.4)
+        shot.position = player.position
+        shot.physicsBody = SKPhysicsBody(rectangleOf: shot.texture!.size())
+        shot.physicsBody?.isDynamic = true
+        shot.physicsBody?.collisionBitMask = 0
+        shot.physicsBody?.contactTestBitMask = 1
         
-        // Create shape node to use during mouse interaction
-        let w = (self.size.width + self.size.height) * 0.05
-        self.spinnyNode = SKShapeNode.init(rectOf: CGSize.init(width: w, height: w), cornerRadius: w * 0.3)
-        
-        if let spinnyNode = self.spinnyNode {
-            spinnyNode.lineWidth = 2.5
+        shot.run(move)
+        self.addChild(shot)
+        let recoilTras = SKAction.moveTo(y: view.frame.height * -0.35 - 5, duration: 0.05)
+        let recoilFrente = SKAction.moveTo(y: view.frame.height * -0.35 + 5, duration: 0.05)
+        let seq = SKAction.sequence([recoilTras,recoilFrente])
+        self.player.run(seq)
+        Timer.scheduledTimer(withTimeInterval: 4.0, repeats: false) { (Timer) in
+            shot.removeFromParent()
+        }
+    }
+    func didBegin(_ contact: SKPhysicsContact) {
+        guard let nodeA = contact.bodyA.node else { return }
+        guard let nodeB = contact.bodyB.node else { return }
+        guard nodeB.name == "enemy" || nodeA.name == "enemy" || nodeA.name == "terra" || nodeA.name == "terra" else{return}
+        let nomeA = nodeA.name?.description
+        let nomeB = nodeB.name?.description
+        if (nomeA == "enemy" && nomeB == "shotCap") || (nomeA == "shotCap" && nomeB == "enemy"){
+        }
+        else if (nomeA == "terra" && nomeB == "shotCap") || (nomeA == "shotCap" && nomeB == "terra"){
+            self.tirosNaTerra += 1
+            if self.tirosNaTerra == 10{
+                self.terra.texture = SKTexture(imageNamed: "terra2")
+            }
+            else if self.tirosNaTerra == 24{
+                self.terra.texture = SKTexture(imageNamed: "terra3")
+            }
+            else if self.tirosNaTerra == 40{
+                self.terra.texture = SKTexture(imageNamed: "terra4")
+            }
+            else if self.tirosNaTerra == 50{
+                self.terra.texture = SKTexture(imageNamed: "terra5")
+            }
+            else if self.tirosNaTerra == 60{
+                self.terra.texture = SKTexture(imageNamed: "terra6")
+            }
+            else if self.tirosNaTerra == 70{
+                let firstNode = nodeA
+                let secondNode = nodeB
+                if let explosion = SKEmitterNode(fileNamed: "ExploTerra") {
+                    explosion.position = firstNode.position
+                    explosion.zPosition = 1
+                    self.numInimigosLocal -= 1
+                    self.addChild(explosion)
+                    Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { (Timer) in
+                        self.gameOver()
+                    }
+                }
+                firstNode.removeFromParent()
+                secondNode.removeFromParent()
+            }
+        }
+        else if (nomeA == "shot" && nomeB == "enemy") || (nomeA == "enemy" && nomeB == "shot"){
             
-            spinnyNode.run(SKAction.repeatForever(SKAction.rotate(byAngle: CGFloat(Double.pi), duration: 1)))
-            spinnyNode.run(SKAction.sequence([SKAction.wait(forDuration: 0.5),
-                                              SKAction.fadeOut(withDuration: 0.5),
-                                              SKAction.removeFromParent()]))
-        }
-    }
-    
-    
-    func touchDown(atPoint pos : CGPoint) {
-        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            n.position = pos
-            n.strokeColor = SKColor.green
-            self.addChild(n)
-        }
-    }
-    
-    func touchMoved(toPoint pos : CGPoint) {
-        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            n.position = pos
-            n.strokeColor = SKColor.blue
-            self.addChild(n)
-        }
-    }
-    
-    func touchUp(atPoint pos : CGPoint) {
-        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            n.position = pos
-            n.strokeColor = SKColor.red
-            self.addChild(n)
-        }
-    }
-    
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if let label = self.label {
-            label.run(SKAction.init(named: "Pulse")!, withKey: "fadeInOut")
+            let firstNode = nodeA
+            let secondNode = nodeB
+            if let explosion = SKEmitterNode(fileNamed: "Explosion") {
+                explosion.position = firstNode.position
+                explosion.zPosition = 1
+                self.numInimigosLocal -= 1
+                addChild(explosion)
+            }
+            firstNode.removeFromParent()
+            secondNode.removeFromParent()
         }
         
-        for t in touches { self.touchDown(atPoint: t.location(in: self)) }
     }
-    
+    func initialSetup(){
+        self.removeAllChildren()
+        if let particles = SKEmitterNode(fileNamed: "Starfield"){
+            particles.position = CGPoint(x: 0, y: 1080)
+            particles.advanceSimulationTime(60)
+            particles.zPosition = -2
+            addChild(particles)
+        }
+        contFase = 0
+        tirosNaTerra = 0
+        self.numInimigosLocal = self.fases[contFase].numeroInimigos
+        terra.texture = SKTexture(imageNamed: "terra")
+        terra.name = "terra"
+        terra.zPosition = -1
+        terra.alpha = 1
+        terra.position = CGPoint(x: 0, y: -360)
+        terra.size = CGSize(width: view!.frame.width, height: view!.frame.height * 0.5)
+        terra.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 1000, height: 50))
+        terra.physicsBody?.usesPreciseCollisionDetection = false
+        terra.physicsBody?.categoryBitMask = 1
+        terra.physicsBody?.collisionBitMask = 0
+        terra.zPosition = 1
+        addChild(terra)
+        player.position = CGPoint(x: 0, y: view!.frame.height * -0.35 )
+        player.zPosition = 1
+        self.enemy.name = "player"
+        addChild(player)
+        setup()
+    }
+    func gameOver(){
+        self.removeAllChildren()
+        let label = SKLabelNode(text: "You Lose!")
+        if let particles = SKEmitterNode(fileNamed: "Starfield"){
+            particles.position = CGPoint(x: 0, y: 1080)
+            particles.advanceSimulationTime(60)
+            particles.zPosition = -2
+            addChild(particles)
+        }
+        label.fontName = "AvenirNext-Bold"
+        label.color = UIColor.white
+        label.fontSize = 50
+        label.position = CGPoint(x: 0, y: 0)
+        label.zPosition = 1
+        addChild(label)
+        Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { (Timer) in
+            self.viewController.buildScene()
+        }
+    }
+    func inicio(){
+        let label = SKLabelNode(text: "Tap To Play")
+        if let particles = SKEmitterNode(fileNamed: "Starfield"){
+            particles.position = CGPoint(x: 0, y: 1080)
+            particles.advanceSimulationTime(60)
+            particles.zPosition = -2
+            addChild(particles)
+        }
+        label.fontName = "AvenirNext-Bold"
+        label.color = UIColor.white
+        label.fontSize = 50
+        label.position = CGPoint(x: 0, y: 0)
+        label.zPosition = 1
+        addChild(label)
+    }
+    func win(){
+        
+        self.removeAllChildren()
+        let label = SKLabelNode(text: "You Won!")
+        if let particles = SKEmitterNode(fileNamed: "Starfield"){
+            particles.position = CGPoint(x: 0, y: 1080)
+            particles.advanceSimulationTime(60)
+            particles.zPosition = -2
+            addChild(particles)
+        }
+        label.fontName = "AvenirNext-Bold"
+        label.color = UIColor.white
+        label.fontSize = 50
+        label.position = CGPoint(x: 0, y: 0)
+        label.zPosition = 1
+        addChild(label)
+        Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { (Timer) in
+            self.viewController.buildScene()
+        }
+    }
+    func setup(){
+        print("setup")
+        let initialX2 =  view!.frame.width * -0.40
+        let initialY2 =  view!.frame.height * 0.409
+        moveEnemy.timingMode = .easeInEaseOut
+        moveEnemy2.timingMode = .easeInEaseOut
+        let seqEnemy = SKAction.sequence([moveEnemy,moveEnemy2])
+        let looping = SKAction.repeatForever(seqEnemy)
+        var posicaoX = initialX2
+        var posicaoY = initialY2
+        for _ in 0...self.fases[contFase].numeroInimigos - 1{
+            let wait = SKAction.wait(forDuration: interval)
+            interval += 0.03
+            let enemyCopy = self.enemy.copy() as! SKSpriteNode
+            enemyCopy.texture = SKTexture(imageNamed: self.skins.randomElement()!)
+            enemyCopy.run(SKAction.sequence([wait,looping]))
+            let larguraInimigo = enemyCopy.frame.width
+            let alturaInimigo = enemyCopy.frame.height
+            if posicaoX > view!.frame.width / 2  {
+                posicaoY -= alturaInimigo + 10
+                posicaoX = initialX2
+            }
+            enemyCopy.position = CGPoint(x: posicaoX , y:  posicaoY )
+            enemyCopy.name = "enemy"
+            enemyCopy.zPosition = 1
+            self.fases[contFase].arrayInimigos.append(enemyCopy)
+            enemyCopy.physicsBody = SKPhysicsBody(rectangleOf: enemy.texture!.size())
+            enemyCopy.physicsBody?.usesPreciseCollisionDetection = true
+            enemyCopy.physicsBody?.categoryBitMask = 1
+            enemyCopy.physicsBody?.collisionBitMask = 0
+            addChild(enemyCopy)
+            posicaoX += larguraInimigo + 10
+        }
+    }
+    func capivaraShot(){
+        if jogando {
+            let shotCap = SKSpriteNode(texture: SKTexture(imageNamed: "laser"))
+            shotCap.name = "shotCap"
+            let move = SKAction.moveTo(y: -500, duration: 0.8)
+            let enemies = self.fases[contFase].arrayInimigos.filter({$0.parent != nil})
+            if let node = enemies.randomElement(){
+                shotCap.position = node.position
+                shotCap.physicsBody = SKPhysicsBody(rectangleOf: shotCap.texture!.size())
+                //fisica shot capivara = shotPlayer
+                shotCap.physicsBody?.isDynamic = true
+                shotCap.physicsBody?.collisionBitMask = 0
+                shotCap.physicsBody?.contactTestBitMask = 1
+                shotCap.zPosition = 1
+                shotCap.blendMode = SKBlendMode.add
+                shotCap.colorBlendFactor = 10.0
+                shotCap.color = UIColor.red
+                shotCap.alpha = 1
+                shotCap.run(move)
+                self.addChild(shotCap)
+                Timer.scheduledTimer(withTimeInterval: 4.0, repeats: false) { (Timer) in
+                    shotCap.removeFromParent()
+                }
+            }
+        }
+    }
+    func trocarFase(){
+        if trocouFase{
+            if self.contFase == self.fases.count{
+                self.contFase = 0
+            }
+            if self.contFase == self.fases.count - 1 {
+                if initialCarregou == false{
+                    initialSetup()
+                    initialCarregou = true
+                }
+            }
+            setup()
+            trocouFase = false
+        }
+        return
+    }
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchMoved(toPoint: t.location(in: self)) }
+        for touch in touches{
+            player.position.x = touch.location(in:self ).x
+        }
     }
-    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if jogando == false{
+            jogando = true
+        }
+        self.onTap = true
+    }
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchUp(atPoint: t.location(in: self)) }
+        self.onTap = false
     }
-    
-    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchUp(atPoint: t.location(in: self)) }
-    }
-    
-    
     override func update(_ currentTime: TimeInterval) {
-        // Called before each frame is rendered
+        if jogando && initialCarregou == false {
+            initialSetup()
+            initialCarregou = true
+        }
+        if jogando{
+            if self.numInimigosLocal == 0 {
+                self.trocouFase = true
+                if contFase == self.fases.count {
+                    
+                    if !terraExplodiu{
+                        jogando = false
+                        self.win()
+                    }
+                }
+                else if contFase < self.fases.count{
+                    self.contFase += 1
+                }
+                if contFase != self.fases.count {
+                    self.numInimigosLocal = self.fases[contFase].numeroInimigos
+                    trocarFase()
+                }
+            }
+
+        }
+        //another logic
+        if lastUpdate == 0{
+            lastUpdate = currentTime
+            return
+        }
+        if lastUpdateCap == 0{
+            lastUpdateCap = currentTime
+            return
+        }
+        
+        let dTime = currentTime - lastUpdate
+        lastUpdate = currentTime
+        lastShot += dTime
+        
+        
+        let dTimeCap = currentTime - lastUpdateCap
+        lastUpdateCap = currentTime
+        lastShotCap += dTimeCap
+        
+        
+        if lastShot > shotInterval{
+            
+            if onTap{
+                disparaPlayer(view: self.view!)
+            }
+            lastShot -= shotInterval
+        }
+        
+        if lastShotCap > shotIntervalCap{
+            //capivara atirar
+            if jogando{
+                capivaraShot()
+            }
+            
+            lastShotCap -= shotIntervalCap
+        }
+        
     }
 }
+
+
+

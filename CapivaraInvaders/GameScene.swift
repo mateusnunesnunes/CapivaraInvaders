@@ -162,6 +162,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if let particles = SKEmitterNode(fileNamed: "Starfield"){
             particles.position = CGPoint(x: 0, y: 1080)
             particles.advanceSimulationTime(60)
+            
             particles.zPosition = -2
             
             addChild(particles)

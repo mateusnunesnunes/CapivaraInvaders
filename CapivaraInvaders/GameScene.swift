@@ -8,7 +8,10 @@
 import SpriteKit
 import GameplayKit
 import UIKit
-class GameScene: SKScene, SKPhysicsContactDelegate {
+import GoogleMobileAds
+ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
+    var interstitial: GADInterstitial!
+    
     let skins = ["capivarinha1","capivarinha2","capivarinha3"]
     let player = SKSpriteNode(imageNamed: "busao2")
     let terra = SKSpriteNode(imageNamed: "terra")
@@ -33,14 +36,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var tirosNaTerra = 0
     var initialCarregou =  false
     var jogando = false
+    var background = false
     let fases: [Fase] = [
         Fase(numeroInimigos: 12, texto: "Fase 1", arrayInimigos: []),
         Fase(numeroInimigos: 18, texto: "Fase 2", arrayInimigos: []),
         Fase(numeroInimigos: 24, texto: "Fase 3", arrayInimigos: []),
         Fase(numeroInimigos: 30, texto: "Fase 4", arrayInimigos: [])
     ]
+    let generator = UIImpactFeedbackGenerator(style: .heavy)
+
     override func didMove(to view: SKView) {
-        print("PRIMERASSA")
+        interstitial = GADInterstitial(adUnitID: "ca-app-pub-3940256099942544/4411468910")
+        let request = GADRequest()
+        interstitial.load(request)
+        interstitial.delegate = self
+        
+        let notificationCenter = NotificationCenter.default
+        notificationCenter.addObserver(self, selector: #selector(appMovedToBackground), name: UIApplication.willResignActiveNotification, object: nil)
+        
+        
+        
         physicsWorld.contactDelegate = self
         physicsWorld.gravity = .zero
         if let particles = SKEmitterNode(fileNamed: "Starfield"){
@@ -51,7 +66,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         inicio()
     }
+    @objc func appMovedToBackground() {
+        print("App moved to background!")
+        background  = true
+    }
+    
     func disparaPlayer(view:SKView){
+        
         let shot = SKSpriteNode(imageNamed: "missil")
         shot.name = "shot"
         let move = SKAction.moveTo(y: 500, duration: 0.4)
@@ -74,42 +95,63 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func didBegin(_ contact: SKPhysicsContact) {
         guard let nodeA = contact.bodyA.node else { return }
         guard let nodeB = contact.bodyB.node else { return }
-        guard nodeB.name == "enemy" || nodeA.name == "enemy" || nodeA.name == "terra" || nodeA.name == "terra" else{return}
+        
+        guard nodeB.name == "enemy" || nodeA.name == "enemy" || nodeA.name == "terra" || nodeB.name == "terra" || nodeA.name == "player" || nodeB.name == "player" || nodeA.name == "shotCap" || nodeB.name == "shotCap" else{return}
+        
+        
+        
         let nomeA = nodeA.name?.description
         let nomeB = nodeB.name?.description
+        
+        
+        
         if (nomeA == "enemy" && nomeB == "shotCap") || (nomeA == "shotCap" && nomeB == "enemy"){
         }
         else if (nomeA == "terra" && nomeB == "shotCap") || (nomeA == "shotCap" && nomeB == "terra"){
             self.tirosNaTerra += 1
-            if self.tirosNaTerra == 10{
+            print(tirosNaTerra)
+            if self.tirosNaTerra == 3{
                 self.terra.texture = SKTexture(imageNamed: "terra2")
+                
             }
-            else if self.tirosNaTerra == 24{
+            else if self.tirosNaTerra == 5{
                 self.terra.texture = SKTexture(imageNamed: "terra3")
+                print("smokeTerra")
+                if let smoke1 = SKEmitterNode(fileNamed: "smokeTerra1") {
+                    smoke1.position = terra.position
+                    smoke1.zPosition = 1
+                    self.addChild(smoke1)
+                }
             }
-            else if self.tirosNaTerra == 40{
+            else if self.tirosNaTerra == 10{
                 self.terra.texture = SKTexture(imageNamed: "terra4")
+                
             }
-            else if self.tirosNaTerra == 50{
+            else if self.tirosNaTerra == 20{
                 self.terra.texture = SKTexture(imageNamed: "terra5")
             }
-            else if self.tirosNaTerra == 60{
+            else if self.tirosNaTerra == 30{
                 self.terra.texture = SKTexture(imageNamed: "terra6")
             }
-            else if self.tirosNaTerra == 70{
+            else if self.tirosNaTerra == 40{
                 let firstNode = nodeA
                 let secondNode = nodeB
                 if let explosion = SKEmitterNode(fileNamed: "ExploTerra") {
                     explosion.position = firstNode.position
                     explosion.zPosition = 1
-                    self.numInimigosLocal -= 1
                     self.addChild(explosion)
+                }
+                firstNode.removeFromParent()
+                secondNode.removeFromParent()
+                if let explosion1 = SKEmitterNode(fileNamed: "ExploTerra") {
+                    explosion1.position = player.position
+                    explosion1.zPosition = 1
+                    self.addChild(explosion1)
+                    player.removeFromParent()
                     Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { (Timer) in
                         self.gameOver()
                     }
                 }
-                firstNode.removeFromParent()
-                secondNode.removeFromParent()
             }
         }
         else if (nomeA == "shot" && nomeB == "enemy") || (nomeA == "enemy" && nomeB == "shot"){
@@ -125,7 +167,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             firstNode.removeFromParent()
             secondNode.removeFromParent()
         }
-        
+        else if (nomeA == "shotCap" && nomeB == "player") || (nomeA == "player" && nomeB == "shotCap"){
+            // tiro capivara com nave
+            
+            generator.impactOccurred(intensity: 2)
+
+            if nomeA == "shotCap"{
+                nodeA.removeFromParent()
+            }
+            else if nomeB == "shotCap"{
+                nodeB.removeFromParent()
+            }
+        }
     }
     func initialSetup(){
         self.removeAllChildren()
@@ -152,7 +205,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(terra)
         player.position = CGPoint(x: 0, y: view!.frame.height * -0.35 )
         player.zPosition = 1
-        self.enemy.name = "player"
+        player.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 100, height: 100))
+        player.physicsBody?.categoryBitMask = 1
+        player.physicsBody?.collisionBitMask = 0
+        player.name = "player"
         addChild(player)
         setup()
     }
@@ -213,7 +269,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     func setup(){
-        print("setup")
         let initialX2 =  view!.frame.width * -0.40
         let initialY2 =  view!.frame.height * 0.409
         moveEnemy.timingMode = .easeInEaseOut
@@ -273,6 +328,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     func trocarFase(){
+        
+        
+        
         if trocouFase{
             if self.contFase == self.fases.count{
                 self.contFase = 0
@@ -302,7 +360,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         self.onTap = false
     }
+    
+    
+    
+    /// Tells the delegate the interstitial had been animated off the screen.
+    func interstitialDidDismissScreen(_ ad: GADInterstitial) {
+        trocarFase()
+    }
+    
     override func update(_ currentTime: TimeInterval) {
+        
         if jogando && initialCarregou == false {
             initialSetup()
             initialCarregou = true
@@ -323,11 +390,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 if contFase != self.fases.count {
                     self.numInimigosLocal = self.fases[contFase].numeroInimigos
                     trocarFase()
+//                    if interstitial.isReady {
+//                        interstitial.present(fromRootViewController:self.viewController )
+//                    }
+//                    else{
+//                        trocarFase()
+//
+//                    }
+                    
+                    
                 }
             }
-
+            
         }
         //another logic
+        
         if lastUpdate == 0{
             lastUpdate = currentTime
             return
@@ -347,9 +424,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         lastShotCap += dTimeCap
         
         
+        
+        
+        
         if lastShot > shotInterval{
             
             if onTap{
+                print("Dis\(currentTime)para")
                 disparaPlayer(view: self.view!)
             }
             lastShot -= shotInterval
@@ -363,6 +444,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             
             lastShotCap -= shotIntervalCap
         }
+        
         
     }
 }

@@ -3,10 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		01042C632420EAD00090C83A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 01042C622420EAD00090C83A /* GoogleService-Info.plist */; };
 		014FCB15241A633900DDBFF7 /* ExploTerra.sks in Resources */ = {isa = PBXBuildFile; fileRef = 014FCB14241A633900DDBFF7 /* ExploTerra.sks */; };
 		015AF3232417D2BA00E9719E /* Capivara.swift in Sources */ = {isa = PBXBuildFile; fileRef = 015AF3222417D2BA00E9719E /* Capivara.swift */; };
 		015CBDB5240E84C700C9A354 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 015CBDB4240E84C700C9A354 /* AppDelegate.swift */; };
@@ -19,10 +20,13 @@
 		015CBDC5240E84C800C9A354 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 015CBDC3240E84C800C9A354 /* LaunchScreen.storyboard */; };
 		015CBDCF240E892A00C9A354 /* Starfield.sks in Resources */ = {isa = PBXBuildFile; fileRef = 015CBDCE240E892A00C9A354 /* Starfield.sks */; };
 		01642725240FD4E500D7606E /* Explosion.sks in Resources */ = {isa = PBXBuildFile; fileRef = 01642724240FD4E500D7606E /* Explosion.sks */; };
+		0184F6002420FADA0042529C /* smokeTerra1.sks in Resources */ = {isa = PBXBuildFile; fileRef = 0184F5FF2420FADA0042529C /* smokeTerra1.sks */; };
 		01D2E164241675890017D954 /* Fase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01D2E163241675890017D954 /* Fase.swift */; };
+		0C5D97E268BEF516A01F4EAC /* Pods_CapivaraInvaders.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71F77E3EA254EB0ED0FEBA29 /* Pods_CapivaraInvaders.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		01042C622420EAD00090C83A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		014FCB14241A633900DDBFF7 /* ExploTerra.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = ExploTerra.sks; sourceTree = "<group>"; };
 		015AF3222417D2BA00E9719E /* Capivara.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Capivara.swift; sourceTree = "<group>"; };
 		015CBDB1240E84C700C9A354 /* CapivaraInvaders.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CapivaraInvaders.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -37,7 +41,11 @@
 		015CBDC6240E84C800C9A354 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		015CBDCE240E892A00C9A354 /* Starfield.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Starfield.sks; sourceTree = "<group>"; };
 		01642724240FD4E500D7606E /* Explosion.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Explosion.sks; sourceTree = "<group>"; };
+		0184F5FF2420FADA0042529C /* smokeTerra1.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = smokeTerra1.sks; sourceTree = "<group>"; };
 		01D2E163241675890017D954 /* Fase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fase.swift; sourceTree = "<group>"; };
+		634C584BC9B5604932D3048F /* Pods-CapivaraInvaders.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CapivaraInvaders.release.xcconfig"; path = "Target Support Files/Pods-CapivaraInvaders/Pods-CapivaraInvaders.release.xcconfig"; sourceTree = "<group>"; };
+		71F77E3EA254EB0ED0FEBA29 /* Pods_CapivaraInvaders.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CapivaraInvaders.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0C2B74817A6FC5E6A26C468 /* Pods-CapivaraInvaders.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CapivaraInvaders.debug.xcconfig"; path = "Target Support Files/Pods-CapivaraInvaders/Pods-CapivaraInvaders.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -45,6 +53,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C5D97E268BEF516A01F4EAC /* Pods_CapivaraInvaders.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -56,6 +65,8 @@
 			children = (
 				015CBDB3240E84C700C9A354 /* CapivaraInvaders */,
 				015CBDB2240E84C700C9A354 /* Products */,
+				7331C6229F54AAEA64EE8E7E /* Pods */,
+				3E008B0971D411A6515E1151 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -70,6 +81,7 @@
 		015CBDB3240E84C700C9A354 /* CapivaraInvaders */ = {
 			isa = PBXGroup;
 			children = (
+				01042C622420EAD00090C83A /* GoogleService-Info.plist */,
 				014FCB14241A633900DDBFF7 /* ExploTerra.sks */,
 				01642724240FD4E500D7606E /* Explosion.sks */,
 				015CBDCE240E892A00C9A354 /* Starfield.sks */,
@@ -84,8 +96,26 @@
 				015CBDC6240E84C800C9A354 /* Info.plist */,
 				01D2E163241675890017D954 /* Fase.swift */,
 				015AF3222417D2BA00E9719E /* Capivara.swift */,
+				0184F5FF2420FADA0042529C /* smokeTerra1.sks */,
 			);
 			path = CapivaraInvaders;
+			sourceTree = "<group>";
+		};
+		3E008B0971D411A6515E1151 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				71F77E3EA254EB0ED0FEBA29 /* Pods_CapivaraInvaders.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		7331C6229F54AAEA64EE8E7E /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				C0C2B74817A6FC5E6A26C468 /* Pods-CapivaraInvaders.debug.xcconfig */,
+				634C584BC9B5604932D3048F /* Pods-CapivaraInvaders.release.xcconfig */,
+			);
+			path = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -95,9 +125,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 015CBDC9240E84C800C9A354 /* Build configuration list for PBXNativeTarget "CapivaraInvaders" */;
 			buildPhases = (
+				225CBF01BE2352B3034F172B /* [CP] Check Pods Manifest.lock */,
 				015CBDAD240E84C700C9A354 /* Sources */,
 				015CBDAE240E84C700C9A354 /* Frameworks */,
 				015CBDAF240E84C700C9A354 /* Resources */,
+				066C8545F0AF55C667FA7454 /* [CP] Embed Pods Frameworks */,
+				01042C642420EE880090C83A /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -148,9 +181,11 @@
 			files = (
 				015CBDCF240E892A00C9A354 /* Starfield.sks in Resources */,
 				015CBDC0240E84C700C9A354 /* Main.storyboard in Resources */,
+				01042C632420EAD00090C83A /* GoogleService-Info.plist in Resources */,
 				015CBDB7240E84C700C9A354 /* GameScene.sks in Resources */,
 				014FCB15241A633900DDBFF7 /* ExploTerra.sks in Resources */,
 				015CBDC2240E84C800C9A354 /* Assets.xcassets in Resources */,
+				0184F6002420FADA0042529C /* smokeTerra1.sks in Resources */,
 				015CBDC5240E84C800C9A354 /* LaunchScreen.storyboard in Resources */,
 				01642725240FD4E500D7606E /* Explosion.sks in Resources */,
 				015CBDB9240E84C700C9A354 /* Actions.sks in Resources */,
@@ -158,6 +193,67 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		01042C642420EE880090C83A /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${TARGET_NAME}",
+				"$(SRCROOT)/$(BUILT_PRODUCTS_DIR)/$(INFOPLIST_PATH)",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\"${PODS_ROOT}/FirebaseCrashlytics/run\"\n\n";
+		};
+		066C8545F0AF55C667FA7454 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CapivaraInvaders/Pods-CapivaraInvaders-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CapivaraInvaders/Pods-CapivaraInvaders-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CapivaraInvaders/Pods-CapivaraInvaders-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		225CBF01BE2352B3034F172B /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-CapivaraInvaders-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		015CBDAD240E84C700C9A354 /* Sources */ = {
@@ -310,45 +406,48 @@
 		};
 		015CBDCA240E84C800C9A354 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C0C2B74817A6FC5E6A26C468 /* Pods-CapivaraInvaders.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1.2;
+				CURRENT_PROJECT_VERSION = 1.5;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = MK55QVZ894;
 				INFOPLIST_FILE = CapivaraInvaders/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = br.com.mateus.capivara1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
 		015CBDCB240E84C800C9A354 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 634C584BC9B5604932D3048F /* Pods-CapivaraInvaders.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1.2;
+				CURRENT_PROJECT_VERSION = 1.5;
 				DEVELOPMENT_TEAM = MK55QVZ894;
 				INFOPLIST_FILE = CapivaraInvaders/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = br.com.mateus.capivara1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

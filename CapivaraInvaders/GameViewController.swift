@@ -28,10 +28,7 @@ class GameViewController: UIViewController {
            }
            view.ignoresSiblingOrder = true
            view.preferredFramesPerSecond = 120
-           view.showsFPS = true
-           view.showsNodeCount = true
-        
-           view.showsPhysics = false
+            view.showsPhysics = false
         }
     }
     override var shouldAutorotate: Bool {

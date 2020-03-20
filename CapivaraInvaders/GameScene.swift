@@ -37,6 +37,7 @@ import GoogleMobileAds
     var initialCarregou =  false
     var jogando = false
     var background = false
+    var pontos = 0
     let fases: [Fase] = [
         Fase(numeroInimigos: 12, texto: "Fase 1", arrayInimigos: []),
         Fase(numeroInimigos: 18, texto: "Fase 2", arrayInimigos: []),
@@ -44,9 +45,10 @@ import GoogleMobileAds
         Fase(numeroInimigos: 30, texto: "Fase 4", arrayInimigos: [])
     ]
     let generator = UIImpactFeedbackGenerator(style: .heavy)
-
+   let labelPontos = SKLabelNode(text: "0")
+    
     override func didMove(to view: SKView) {
-        interstitial = GADInterstitial(adUnitID: "ca-app-pub-3940256099942544/4411468910")
+        interstitial = GADInterstitial(adUnitID: "ca-app-pub-4294975211923841/4305940624")
         let request = GADRequest()
         interstitial.load(request)
         interstitial.delegate = self
@@ -65,6 +67,16 @@ import GoogleMobileAds
             addChild(particles)
         }
         inicio()
+    }
+    func setuplabelPontos(){
+        labelPontos.removeFromParent()
+        self.labelPontos.fontName = "AvenirNext-Bold"
+        self.labelPontos.color = UIColor.white
+        self.labelPontos.fontSize = 20
+        print("cabo pra nois \(view!.frame.height / 2)")
+        self.labelPontos.position = CGPoint(x: -view!.frame.width / 2 + 20, y: -view!.frame.height / 3)
+        self.labelPontos.zPosition = 2
+        addChild(labelPontos)
     }
     @objc func appMovedToBackground() {
         print("App moved to background!")
@@ -109,7 +121,7 @@ import GoogleMobileAds
         }
         else if (nomeA == "terra" && nomeB == "shotCap") || (nomeA == "shotCap" && nomeB == "terra"){
             self.tirosNaTerra += 1
-            print(tirosNaTerra)
+        
             if self.tirosNaTerra == 3{
                 self.terra.texture = SKTexture(imageNamed: "terra2")
                 
@@ -161,6 +173,8 @@ import GoogleMobileAds
             if let explosion = SKEmitterNode(fileNamed: "Explosion") {
                 explosion.position = firstNode.position
                 explosion.zPosition = 1
+                self.pontos += 1
+                self.labelPontos.text = "\(pontos)"
                 self.numInimigosLocal -= 1
                 addChild(explosion)
             }
@@ -234,6 +248,7 @@ import GoogleMobileAds
         }
     }
     func inicio(){
+        
         let label = SKLabelNode(text: "Tap To Play")
         if let particles = SKEmitterNode(fileNamed: "Starfield"){
             particles.position = CGPoint(x: 0, y: 1080)
@@ -248,6 +263,7 @@ import GoogleMobileAds
         label.zPosition = 1
         addChild(label)
     }
+    
     func win(){
         
         self.removeAllChildren()
@@ -269,6 +285,7 @@ import GoogleMobileAds
         }
     }
     func setup(){
+        setuplabelPontos()
         let initialX2 =  view!.frame.width * -0.40
         let initialY2 =  view!.frame.height * 0.409
         moveEnemy.timingMode = .easeInEaseOut
@@ -389,14 +406,14 @@ import GoogleMobileAds
                 }
                 if contFase != self.fases.count {
                     self.numInimigosLocal = self.fases[contFase].numeroInimigos
-                    trocarFase()
-//                    if interstitial.isReady {
-//                        interstitial.present(fromRootViewController:self.viewController )
-//                    }
-//                    else{
-//                        trocarFase()
-//
-//                    }
+//                    trocarFase()
+                    if interstitial.isReady {
+                        interstitial.present(fromRootViewController:self.viewController )
+                    }
+                    else{
+                        trocarFase()
+
+                    }
                     
                     
                 }

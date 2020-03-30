@@ -24,6 +24,7 @@ class GameViewController: UIViewController {
               
                scene.size = UIScreen.main.bounds.size
                scene.viewController = self
+            
                view.presentScene(scene)
            }
            view.ignoresSiblingOrder = true

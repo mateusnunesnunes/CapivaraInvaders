@@ -18,7 +18,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
     
     let player = SKSpriteNode(imageNamed: "busao2")
     let terra = SKSpriteNode(imageNamed: "terra")
-    
+    var pontuacao = SKSpriteNode(texture: SKTexture(imageNamed:"pontuacao"))
     let enemey1 = Capivara(nVida: 1, nNode: SKSpriteNode(imageNamed: "capivarinha1"))
     let enemey2 = Capivara(nVida: 2, nNode: SKSpriteNode(imageNamed: "capivaraBoss21"))
     let enemey3 = Capivara(nVida: 17, nNode: SKSpriteNode(imageNamed: "boss1"))
@@ -54,7 +54,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
     ]
     let generator = UIImpactFeedbackGenerator(style: .heavy)
     let labelPontos = SKLabelNode(text: "0")
-    
+    let labelOrdas = SKLabelNode(text: "0")
     override func didMove(to view: SKView) {
         interstitial = GADInterstitial(adUnitID: "ca-app-pub-4294975211923841/4305940624")
         let request = GADRequest()
@@ -73,14 +73,24 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
     func setuplabelPontos(){
         labelPontos.removeFromParent()
         self.labelPontos.fontName = "AvenirNext-Bold"
-        self.labelPontos.color = UIColor.white
+        self.labelPontos.fontColor = #colorLiteral(red: 0, green: 0.9960784314, blue: 0, alpha: 1)
         self.labelPontos.fontSize = 20
-        
-        self.labelPontos.position = CGPoint(x: -view!.frame.width / 2 + 20, y: -view!.frame.height / 3)
+     
+        self.labelPontos.position = CGPoint(x: self.frame.maxX  - 50, y:self.frame.maxY  - 30)
         self.labelPontos.zPosition = 2
         addChild(labelPontos)
     }
-     
+    func setuplabelOrdas(){
+         labelOrdas.removeFromParent()
+        labelOrdas.text = "\(self.contFase + 1)/4"
+         self.labelOrdas.fontName = "AvenirNext-Bold"
+         self.labelOrdas.fontColor = #colorLiteral(red: 0, green: 0.9960784314, blue: 0, alpha: 1)
+         self.labelOrdas.fontSize = 20
+      
+         self.labelOrdas.position = CGPoint(x: self.frame.minX  + 50, y:self.frame.maxY  - 30)
+         self.labelOrdas.zPosition = 2
+         addChild(labelOrdas)
+    }
     
     func disparaPlayer(view:SKView){
         
@@ -219,7 +229,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
             self.arrayInimigosAcertados.forEach({elem in
                 if elem.position.x == nodeEnemy.position.x{
                     tem = true
-                    print("\(nodeEnemy.position.x) já foi")
                     if nodeEnemy.position.x < -100{
                         
                         self.vidasBoss2[0] -= 1
@@ -229,7 +238,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
                             explosion.position = firstNode.position
                             explosion.position.y += 25
                             explosion.zPosition = 1
-                            self.pontos += 5
                             self.labelPontos.text = "\(pontos)"
                             addChild(explosion)
                         }
@@ -265,7 +273,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
                             explosion.position = firstNode.position
                             explosion.position.y += 25
                             explosion.zPosition = 1
-                            self.pontos += 5
                             self.labelPontos.text = "\(pontos)"
                             addChild(explosion)
                         }
@@ -301,7 +308,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
                             explosion.position = nodeEnemy.position
                             explosion.position.y += 25
                             explosion.zPosition = 1
-                            self.pontos += 5
                             self.labelPontos.text = "\(pontos)"
                             addChild(explosion)
                         }
@@ -347,7 +353,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
                     explosion.position = secondNode.position
                 }
                 explosion.zPosition = 1
-                self.pontos += 5
                 self.labelPontos.text = "\(pontos)"
                 addChild(explosion)
                 if firstNode.name == "shot"{
@@ -381,6 +386,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
         }
         else if (nomeA == "shotCap" && nomeB == "player") || (nomeA == "player" && nomeB == "shotCap"){
             // tiro capivara com nave
+            self.player.texture = SKTexture(imageNamed: "busaoEscudo1")
+            Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { (Timer) in
+                self.player.texture = SKTexture(imageNamed: "busao2")
+            }
             generator.impactOccurred(intensity: 2)
             if nomeA == "shotCap"{
                 nodeA.removeFromParent()
@@ -388,6 +397,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
             else if nomeB == "shotCap"{
                 nodeB.removeFromParent()
             }
+            
         }
     }
     func initialSetup(){
@@ -398,6 +408,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
             particles.zPosition = -2
             addChild(particles)
         }
+        self.pontuacao = SKSpriteNode(texture: SKTexture(imageNamed: "pontuacao"), size: CGSize(width: view!.frame.width, height: 70))
+        self.pontuacao.position = CGPoint(x: 0 , y: (view!.frame.height / 2) - 15)
+        addChild(self.pontuacao)
         contFase = 0
         tirosNaTerra = 0
         self.numInimigosLocal = self.fases[contFase].numeroInimigos
@@ -413,6 +426,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
         terra.physicsBody?.collisionBitMask = 0
         terra.zPosition = 1
         addChild(terra)
+        
         player.position = CGPoint(x: 0, y: view!.frame.height * -0.35 )
         player.zPosition = 1
         player.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 100, height: 100))
@@ -444,7 +458,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
         }
     }
     func inicio(){
-        
         let label = SKLabelNode(text: "Tap To Play")
         if let particles = SKEmitterNode(fileNamed: "Starfield"){
             particles.position = CGPoint(x: 0, y: 1080)
@@ -482,8 +495,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
     }
     func setup(){
         setuplabelPontos()
+        setuplabelOrdas()
         let initialX2 =  view!.frame.width * -0.40
-        let initialY2 =  view!.frame.height * 0.409
+        let initialY2 =  view!.frame.height * 0.35
         moveEnemy.timingMode = .easeInEaseOut
         moveEnemy2.timingMode = .easeInEaseOut
         let seqEnemy = SKAction.sequence([moveEnemy,moveEnemy2])
@@ -552,7 +566,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
             let shotCap = SKSpriteNode(texture: SKTexture(imageNamed: "laser"))
             shotCap.name = "shotCap"
             let move = SKAction.moveTo(y: -500, duration: 0.8)
-            print("contFase = \(contFase)")
             let enemies = self.fases[contFase].arrayInimigos.filter({$0.parent != nil})
             if let node = enemies.randomElement(){
                 shotCap.position = node.position
@@ -606,9 +619,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
     }
   
     /// Tells the delegate the interstitial had been animated off the screen.
-//    func interstitialDidDismissScreen(_ ad: GADInterstitial) {
-//        trocarFase()
-//    }
+    func interstitialDidDismissScreen(_ ad: GADInterstitial) {
+        trocarFase()
+    }
     
     override func update(_ currentTime: TimeInterval) {
         
@@ -632,13 +645,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
                 if contFase != self.fases.count {
                     self.numInimigosLocal = self.fases[contFase].numeroInimigos
                                         trocarFase()
-//                    if interstitial.isReady {
-//                        interstitial.present(fromRootViewController:self.viewController )
-//                    }
-//                    else{
-//                        trocarFase()
-//
-//                    }
+                    if interstitial.isReady {
+                        interstitial.present(fromRootViewController:self.viewController )
+                    }
+                    else{
+                        trocarFase()
+
+                    }
                 }
             }
         }

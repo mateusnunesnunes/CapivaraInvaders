@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "busao2.png",
+      "filename" : "pontuacao.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "busao2@2x.png",
+      "filename" : "pontuacao@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "busao2@3x.png",
+      "filename" : "pontuacao@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

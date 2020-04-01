@@ -17,6 +17,10 @@ class GameViewController: UIViewController {
         
         buildScene()
     }
+    override func viewDidAppear(_ animated: Bool) {
+        print("qqdeu")
+        SKTAudio.sharedInstance().resumeBackgroundMusic()
+    }
     func buildScene(){
         if let view = self.view as! SKView? {
            if let scene = SKScene(fileNamed: "GameScene") as? GameScene{

@@ -55,8 +55,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
     let generator = UIImpactFeedbackGenerator(style: .heavy)
     let labelPontos = SKLabelNode(text: "0")
     let labelOrdas = SKLabelNode(text: "0")
+    
+    
+    
     override func didMove(to view: SKView) {
-        interstitial = GADInterstitial(adUnitID: "ca-app-pub-4294975211923841/4305940624")
+         interstitial = GADInterstitial(adUnitID: "ca-app-pub-4294975211923841/4305940624")
         let request = GADRequest()
         interstitial.load(request)
         interstitial.delegate = self
@@ -68,6 +71,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
             particles.zPosition = -2
             addChild(particles)
         }
+        SKTAudio.sharedInstance().playBackgroundMusic("Powerup.mp3")
+        
+        
         inicio()
     }
     func setuplabelPontos(){
@@ -165,38 +171,43 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
                 self.terra.texture = SKTexture(imageNamed: "terra4")
                 
             }
-            else if self.tirosNaTerra == 20{
-                self.terra.texture = SKTexture(imageNamed: "terra5")
-                 if let smoke1 = SKEmitterNode(fileNamed: "smokeTerra1") {
-                    smoke1.position = terra.position
-                    smoke1.position.y -= 30
-                    smoke1.zPosition = 1
-                    self.addChild(smoke1)
+            else{
+                SKTAudio.sharedInstance().playSoundEffect("terraAlarm.mp3")
+                if self.tirosNaTerra == 20{
+                    
+                    self.terra.texture = SKTexture(imageNamed: "terra5")
+                     if let smoke1 = SKEmitterNode(fileNamed: "smokeTerra1") {
+                        smoke1.position = terra.position
+                        smoke1.position.y -= 30
+                        smoke1.zPosition = 1
+                        self.addChild(smoke1)
+                    }
                 }
-            }
-            else if self.tirosNaTerra == 30{
-                self.terra.texture = SKTexture(imageNamed: "terra6")
-            }
-            else if self.tirosNaTerra == 40{
-                let firstNode = nodeA
-                let secondNode = nodeB
-                if let explosion = SKEmitterNode(fileNamed: "ExploTerra") {
-                    explosion.position = firstNode.position
-                    explosion.zPosition = 1
-                    self.addChild(explosion)
+                else if self.tirosNaTerra == 30{
+                    self.terra.texture = SKTexture(imageNamed: "terra6")
                 }
-                firstNode.removeFromParent()
-                secondNode.removeFromParent()
-                if let explosion1 = SKEmitterNode(fileNamed: "ExploTerra") {
-                    explosion1.position = player.position
-                    explosion1.zPosition = 1
-                    self.addChild(explosion1)
-                    player.removeFromParent()
-                    Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { (Timer) in
-                        self.gameOver()
+                else if self.tirosNaTerra == 40{
+                    let firstNode = nodeA
+                    let secondNode = nodeB
+                    if let explosion = SKEmitterNode(fileNamed: "ExploTerra") {
+                        explosion.position = firstNode.position
+                        explosion.zPosition = 1
+                        self.addChild(explosion)
+                    }
+                    firstNode.removeFromParent()
+                    secondNode.removeFromParent()
+                    if let explosion1 = SKEmitterNode(fileNamed: "ExploTerra") {
+                        explosion1.position = player.position
+                        explosion1.zPosition = 1
+                        self.addChild(explosion1)
+                        player.removeFromParent()
+                        Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { (Timer) in
+                            self.gameOver()
+                        }
                     }
                 }
             }
+            
         }
         else if (nomeA == "shot" && nomeB == "enemy") || (nomeA == "enemy" && nomeB == "shot"){
             let firstNode = nodeA
@@ -385,7 +396,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
             }
         }
         else if (nomeA == "shotCap" && nomeB == "player") || (nomeA == "player" && nomeB == "shotCap"){
-            // tiro capivara com nave
+            // tiro capivara com nave earthshield2.wav
+            SKTAudio.sharedInstance().playSoundEffect("earthshield2.wav")
             self.player.texture = SKTexture(imageNamed: "busaoEscudo1")
             Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { (Timer) in
                 self.player.texture = SKTexture(imageNamed: "busao2")
@@ -438,7 +450,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
     }
     func gameOver(){
         self.removeAllChildren()
-        let label = SKLabelNode(text: "You Lose!")
+        let label = SKLabelNode(text: "You Lose! \n\(self.pontos)")
+        label.numberOfLines = 0
+        label.preferredMaxLayoutWidth = 250
+        label.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.center
+        let attrString = NSMutableAttributedString(string: "You Lose! \n\(self.pontos)")
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = .center
+        let range = NSRange(location: 0, length: "You Lose! \n\(self.pontos)".count)
+        attrString.addAttribute(NSAttributedString.Key.paragraphStyle, value: paragraphStyle, range: range)
+        attrString.addAttributes([NSAttributedString.Key.foregroundColor : UIColor.white, NSAttributedString.Key.font : UIFont.init(name: "AvenirNext-Bold", size: 50)], range: range)
+        label.attributedText = attrString
         if let particles = SKEmitterNode(fileNamed: "Starfield"){
             particles.position = CGPoint(x: 0, y: 1080)
             particles.advanceSimulationTime(60)
@@ -447,9 +469,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
             
             addChild(particles)
         }
-        label.fontName = "AvenirNext-Bold"
-        label.color = UIColor.white
-        label.fontSize = 50
         label.position = CGPoint(x: 0, y: 0)
         label.zPosition = 1
         addChild(label)
@@ -476,16 +495,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
     func win(){
         
         self.removeAllChildren()
-        let label = SKLabelNode(text: "You Won!")
+        let label = SKLabelNode(text: "You Won! \n\(self.pontos)")
+        
+        label.numberOfLines = 0
+        label.preferredMaxLayoutWidth = 250
+        label.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.center
+        let attrString = NSMutableAttributedString(string: "You Won! \n\(self.pontos)")
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = .center
+        let range = NSRange(location: 0, length: "You Won! \n\(self.pontos)".count)
+        attrString.addAttribute(NSAttributedString.Key.paragraphStyle, value: paragraphStyle, range: range)
+        attrString.addAttributes([NSAttributedString.Key.foregroundColor : UIColor.white, NSAttributedString.Key.font : UIFont.init(name: "AvenirNext-Bold", size: 50)], range: range)
+        label.attributedText = attrString
+        
         if let particles = SKEmitterNode(fileNamed: "Starfield"){
             particles.position = CGPoint(x: 0, y: 1080)
             particles.advanceSimulationTime(60)
             particles.zPosition = -2
             addChild(particles)
         }
-        label.fontName = "AvenirNext-Bold"
-        label.color = UIColor.white
-        label.fontSize = 50
         label.position = CGPoint(x: 0, y: 0)
         label.zPosition = 1
         addChild(label)
@@ -504,12 +532,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
         let looping = SKAction.repeatForever(seqEnemy)
         var posicaoX = initialX2
         var posicaoY = initialY2
-
+        
         for _ in 0...self.fases[contFase].numeroInimigos - 1{
             let wait = SKAction.wait(forDuration: interval)
             interval += 0.03
             var enemyCopy: SKSpriteNode!
-            
+           
             if contFase < 2{
                 enemyCopy = self.enemey1.node.copy() as? SKSpriteNode
                 enemyCopy.texture = SKTexture(imageNamed: self.skins.randomElement()!)
@@ -557,9 +585,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
             self.fases[contFase].arrayInimigos.append(enemyCopy)
             Timer.scheduledTimer(withTimeInterval: 2, repeats: false) { (Timer) in
                 self.addChild(enemyCopy)
+                SKTAudio.sharedInstance().playSoundEffect("alien3.wav")
+                 
             }
             posicaoX += larguraInimigo + 10
         }
+        
     }
     func capivaraShot(){
         if jogando {
@@ -581,6 +612,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
                 shotCap.alpha = 1
                 shotCap.run(move)
                 self.addChild(shotCap)
+                SKTAudio.sharedInstance().playSoundEffect("lazer3.wav")
                 Timer.scheduledTimer(withTimeInterval: 4.0, repeats: false) { (Timer) in
                     shotCap.removeFromParent()
                 }
@@ -681,6 +713,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
             //capivara atirar
             if jogando{
                 capivaraShot()
+                
             }
             lastShotCap -= shotIntervalCap
         }

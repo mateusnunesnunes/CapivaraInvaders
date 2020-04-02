@@ -15,7 +15,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
     let skins = ["capivarinha1","capivarinha2","capivarinha3"]
     let skinBoss2 = ["capivaraBoss23","capivaraBoss22","capivaraBoss21"]
     let skinBoss3 = ["boss1","boss2","boss3"]
-    
     let player = SKSpriteNode(imageNamed: "busao2")
     let terra = SKSpriteNode(imageNamed: "terra")
     var pontuacao = SKSpriteNode(texture: SKTexture(imageNamed:"pontuacao"))
@@ -24,7 +23,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
     let enemey3 = Capivara(nVida: 17, nNode: SKSpriteNode(imageNamed: "boss1"))
     var arrayInimigosAcertados : [SKNode] = []
     
-    var vidaBoss3 = 25
+    var vidaBoss3 = 45
     var onTap  = false
     var lastUpdate = TimeInterval()
     var shotInterval = TimeInterval(0.3)
@@ -55,9 +54,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
     let generator = UIImpactFeedbackGenerator(style: .heavy)
     let labelPontos = SKLabelNode(text: "0")
     let labelOrdas = SKLabelNode(text: "0")
-    
-    
-    
     override func didMove(to view: SKView) {
          interstitial = GADInterstitial(adUnitID: "ca-app-pub-4294975211923841/4305940624")
         let request = GADRequest()
@@ -71,6 +67,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
             particles.zPosition = -2
             addChild(particles)
         }
+
         SKTAudio.sharedInstance().playBackgroundMusic("Powerup.mp3")
         
         
@@ -97,7 +94,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
          self.labelOrdas.zPosition = 2
          addChild(labelOrdas)
     }
-    
     func disparaPlayer(view:SKView){
         
         let shot = SKSpriteNode(imageNamed: "missil")
@@ -119,22 +115,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
             shot.removeFromParent()
         }
     }
-    
-    
-    
     func didBegin(_ contact: SKPhysicsContact ) {
         guard let nodeA = contact.bodyA.node else { return }
         guard let nodeB = contact.bodyB.node else { return }
-        
         guard nodeB.name == "enemy" || nodeA.name == "enemy" || nodeA.name == "terra" || nodeB.name == "terra" || nodeA.name == "player" || nodeB.name == "player" || nodeA.name == "shotCap" || nodeB.name == "shotCap" || nodeA.name == "enemy2" || nodeB.name == "enemy2" || nodeA.name == "enemy3" || nodeB.name == "enemy3" else{return}
-        
-        
-        
         let nomeA = nodeA.name?.description
         let nomeB = nodeB.name?.description
-        
-        
-        
         if (nomeA == "enemy" && nomeB == "shotCap") || (nomeA == "shotCap" && nomeB == "enemy"){
         }
         else if (nomeA == "terra" && nomeB == "shotCap") || (nomeA == "shotCap" && nomeB == "terra"){
@@ -174,11 +160,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
             else{
                 SKTAudio.sharedInstance().playSoundEffect("terraAlarm.mp3")
                 if self.tirosNaTerra == 20{
-                    
-                    self.terra.texture = SKTexture(imageNamed: "terra5")
+                     self.terra.texture = SKTexture(imageNamed: "terra5")
                      if let smoke1 = SKEmitterNode(fileNamed: "smokeTerra1") {
                         smoke1.position = terra.position
-                        smoke1.position.y -= 30
+                        smoke1.position.y -= 70
                         smoke1.zPosition = 1
                         self.addChild(smoke1)
                     }
@@ -491,7 +476,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
         label.zPosition = 1
         addChild(label)
     }
-    
     func win(){
         
         self.removeAllChildren()
@@ -583,15 +567,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
             enemyCopy.physicsBody?.categoryBitMask = 1
             enemyCopy.physicsBody?.collisionBitMask = 0
             self.fases[contFase].arrayInimigos.append(enemyCopy)
-            Timer.scheduledTimer(withTimeInterval: 2, repeats: false) { (Timer) in
-                self.addChild(enemyCopy)
-                SKTAudio.sharedInstance().playSoundEffect("alien3.wav")
-                 
+            if contFase == 1{
+                Timer.scheduledTimer(withTimeInterval: 6, repeats: false) { (Timer) in
+                    self.addChild(enemyCopy)
+                    SKTAudio.sharedInstance().playSoundEffect("alien3.wav")
+                }
             }
+            else{
+                Timer.scheduledTimer(withTimeInterval: 2, repeats: false) { (Timer) in
+                    self.addChild(enemyCopy)
+                    SKTAudio.sharedInstance().playSoundEffect("alien3.wav")
+                }
+            }
+            
+            
+            
             posicaoX += larguraInimigo + 10
         }
         
     }
+   
     func capivaraShot(){
         if jogando {
             let shotCap = SKSpriteNode(texture: SKTexture(imageNamed: "laser"))
@@ -600,6 +595,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
             let enemies = self.fases[contFase].arrayInimigos.filter({$0.parent != nil})
             if let node = enemies.randomElement(){
                 shotCap.position = node.position
+                if contFase == 3{
+                    shotCap.position.x = CGFloat(Int.random(in: -200...200))
+                }
                 shotCap.physicsBody = SKPhysicsBody(rectangleOf: shotCap.texture!.size())
                 //fisica shot capivara = shotPlayer
                 shotCap.physicsBody?.isDynamic = true
@@ -649,74 +647,79 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         self.onTap = false
     }
-  
-    /// Tells the delegate the interstitial had been animated off the screen.
+
     func interstitialDidDismissScreen(_ ad: GADInterstitial) {
+        
         trocarFase()
     }
-    
     override func update(_ currentTime: TimeInterval) {
-        
-        if jogando && initialCarregou == false {
-            initialSetup()
-            initialCarregou = true
-        }
-        if jogando{
-            if self.numInimigosLocal == 0 {
-                self.trocouFase = true
-                if contFase == self.fases.count {
-                    
-                    if !terraExplodiu{
-                        jogando = false
-                        self.win()
-                    }
-                }
-                else if contFase < self.fases.count{
-                    self.contFase += 1
-                }
-                if contFase != self.fases.count {
-                    self.numInimigosLocal = self.fases[contFase].numeroInimigos
-                                        trocarFase()
-                    if interstitial.isReady {
-                        interstitial.present(fromRootViewController:self.viewController )
-                    }
-                    else{
-                        trocarFase()
-
-                    }
-                }
+            if jogando && initialCarregou == false {
+                initialSetup()
+                initialCarregou = true
             }
-        }
-        //another logic
-        if lastUpdate == 0{
-            lastUpdate = currentTime
-            return
-        }
-        if lastUpdateCap == 0{
-            lastUpdateCap = currentTime
-            return
-        }
-        let dTime = currentTime - lastUpdate
-        lastUpdate = currentTime
-        lastShot += dTime
-        let dTimeCap = currentTime - lastUpdateCap
-        lastUpdateCap = currentTime
-        lastShotCap += dTimeCap
-        if lastShot > shotInterval{
-            if onTap{
-                
-                disparaPlayer(view: self.view!)
-            }
-            lastShot -= shotInterval
-        }
-        if lastShotCap > shotIntervalCap{
-            //capivara atirar
             if jogando{
-                capivaraShot()
-                
+                print("INIMIGOS = \(self.numInimigosLocal)")
+                if self.numInimigosLocal == 0 {
+                    self.trocouFase = true
+                    if contFase == self.fases.count {
+                        
+                        if !terraExplodiu{
+                            jogando = false
+                            self.win()
+                        }
+                    }
+                    else if contFase < self.fases.count{
+                        self.contFase += 1
+                    }
+                    if contFase != self.fases.count {
+                        self.numInimigosLocal = self.fases[contFase].numeroInimigos
+                                            
+                        if interstitial.isReady {
+                            interstitial.present(fromRootViewController:self.viewController )
+                            
+                        }
+                        else{
+                            
+                            trocarFase()
+
+                        }
+                    }
+                }
             }
-            lastShotCap -= shotIntervalCap
-        }
+            //another logic
+            if lastUpdate == 0{
+                lastUpdate = currentTime
+                return
+            }
+            if lastUpdateCap == 0{
+                lastUpdateCap = currentTime
+                return
+            }
+            let dTime = currentTime - lastUpdate
+            lastUpdate = currentTime
+            lastShot += dTime
+            let dTimeCap = currentTime - lastUpdateCap
+            lastUpdateCap = currentTime
+            lastShotCap += dTimeCap
+            if lastShot > shotInterval{
+                if onTap{
+                    
+                    disparaPlayer(view: self.view!)
+                }
+                lastShot -= shotInterval
+            }
+            if lastShotCap > shotIntervalCap{
+                //capivara atirar
+                if jogando{
+                    
+                        capivaraShot()
+                    
+                    
+                    
+                }
+                lastShotCap -= shotIntervalCap
+            }
+        
     }
 }
 

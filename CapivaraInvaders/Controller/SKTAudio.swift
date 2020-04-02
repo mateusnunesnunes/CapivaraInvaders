@@ -37,10 +37,21 @@ public class SKTAudio {
         player.pause()
       }
     }
-  }
+    if let player = soundEffectPlayer {
+        if player.isPlaying {
+            player.pause()
+          }
+    }
+    
+    }
 
   public func resumeBackgroundMusic() {
     if let player = backgroundMusicPlayer {
+      if !player.isPlaying {
+        player.play()
+      }
+    }
+    if let player = soundEffectPlayer {
       if !player.isPlaying {
         player.play()
       }

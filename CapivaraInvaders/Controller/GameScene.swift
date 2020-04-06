@@ -55,7 +55,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate, GADInterstitialDelegate {
     let labelPontos = SKLabelNode(text: "0")
     let labelOrdas = SKLabelNode(text: "0")
     override func didMove(to view: SKView) {
-         interstitial = GADInterstitial(adUnitID: "ca-app-pub-6710438178084678/6532404869")
+        var id = "ca-app-pub-6710438178084678/6532404869"
+        #if DEBUG // Usa ID de teste
+           id = "ca-app-pub-3940256099942544/4411468910"
+            
+        #endif
+         interstitial = GADInterstitial(adUnitID: id)
         let request = GADRequest()
         interstitial.load(request)
         interstitial.delegate = self
